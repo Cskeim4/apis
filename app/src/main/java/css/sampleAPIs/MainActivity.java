@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -24,7 +25,7 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
 
     TextView textViewStatus;
-    Button buttonGetFact, buttonCurrency, buttonWeather, buttonSpaceNews, buttonStudentAPI;
+    Button buttonGetFact, buttonCurrency, buttonWeather, buttonSpaceNews, buttonSongLyrics;
 
     // ---- Remember to use Volley web library add the following to the Module build.gradle file, see https://developer.android.com/training/volley
     //      implementation 'com.android.volley:volley:1.1.1'
@@ -41,14 +42,47 @@ public class MainActivity extends AppCompatActivity {
         setupButtonCurrency();
         setupButtonWeather();
         setupButtonSpaceNews();
-        setupButtonStudentAPI();
+        setupButtonSongLyrics();
     }
 
     private void getStudentAPI() {
         // ======================= Student must add code here to get JSON data from an API =======================
-        textViewStatus.setText("Not implemented yet ....");
 
+        //Get the url from the api to the json data for Stairway to Heaven by Led Zeppelin
+        String url = "https://api.lyrics.ovh/v1/Led%20Zeppelin/Stairway%20to%20Heaven";
+
+        // Create a Volley web request to receive back a JSON object.
+        // This requires two listeners for Async response, onResponse() and onErrorResponse()
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Remember to add the following to the module build.gradle file for the gson library for parsing json files
+                        // implementation 'com.google.code.gson:gson:2.8.6'
+                        Gson gson = new Gson();
+                        //Set the text view to the song lyric object
+                        SongLyrics obj = gson.fromJson(response.toString(), SongLyrics.class);
+                        textViewStatus.setText(obj.lyrics);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    //Send an error if the web request fails
+                    public void onErrorResponse(VolleyError error) {
+                        textViewStatus.setText("ERROR Response: " + error.toString());
+                    }
+                });
+
+        // Create a RequestQueue used to send web requests using Volley
+        RequestQueue queue = Volley.newRequestQueue(this);
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        //Add the request to the queue
+        queue.add(jsonObjectRequest);
     }
+
     private void getCatFact() {
         // Define URL to use. Using Cat Facts API here. Note number of facts set to 1
         // ---- Remember to add the following permission to the AndroidManifest.xml file
@@ -211,12 +245,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setupButtonStudentAPI() {
-        buttonStudentAPI = findViewById(R.id.buttonStudentAPI);
-        buttonStudentAPI.setOnClickListener(new View.OnClickListener() {
+    //Set-up response when song lyric button is clicked, then call the getStudentAPI() method
+    private void setupButtonSongLyrics() {
+        buttonSongLyrics = findViewById(R.id.buttonSongLyrics);
+        buttonSongLyrics.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("CIS 3334", "getStudentAPI onClick");
+                Log.d("CIS 3334", "getSongLyrics onClick");
                 getStudentAPI();
             }
         });

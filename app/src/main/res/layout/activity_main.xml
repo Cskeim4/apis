@@ -39,7 +39,7 @@
         android:layout_marginStart="36dp"
         android:text="Status: "
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonStudentAPI" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonSongLyrics" />
 
     <Button
         android:id="@+id/buttonCurrency"
@@ -66,10 +66,10 @@
         tools:layout_editor_absoluteX="16dp" />
 
     <Button
-        android:id="@+id/buttonStudentAPI"
+        android:id="@+id/buttonSongLyrics"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Student Added API"
+        android:text="Get Song Lyrics"
         app:layout_constraintTop_toBottomOf="@+id/buttonSpaceNews"
         tools:layout_editor_absoluteX="120dp" />
 
